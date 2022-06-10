@@ -54,7 +54,10 @@ code_mapping_tables = [
     "xx_codes",
     "who_alleles",
     "who_group",
+    "shortnulls",
+    "exp_alleles",
 ]
+CodeMapping = namedtuple("CodeMapping", code_mapping_tables)
 
 
 def expression_reduce(df):
@@ -324,7 +327,14 @@ def generate_alleles_and_xx_codes_and_who(
         )
         exp_alleles = {k: v.split("/") for k, v in exp_alleles.items()}
 
-        return valid_alleles, who_alleles, xx_codes, who_group, shortnulls, exp_alleles
+        return CodeMapping(
+            alleles=valid_alleles,
+            xx_codes=xx_codes,
+            who_alleles=who_alleles,
+            who_group=who_group,
+            shortnulls=shortnulls,
+            exp_alleles=exp_alleles,
+        )
 
     # Create a Pandas DataFrame from the mac_code list file
     # Skip the header (first 6 lines) and use only the Allele column
@@ -461,7 +471,14 @@ def generate_alleles_and_xx_codes_and_who(
     db.save_dict(db_connection, "shortnulls", shortnulls, ("shortnull", "allele_list"))
     shortnulls = {k: v.split("/") for k, v in shortnulls.items()}
 
-    return valid_alleles, who_alleles, xx_codes, who_group, shortnulls, exp_alleles
+    return CodeMapping(
+        alleles=valid_alleles,
+        xx_codes=xx_codes,
+        who_alleles=who_alleles,
+        who_group=who_group,
+        shortnulls=shortnulls,
+        exp_alleles=exp_alleles,
+    )
 
 
 def generate_mac_codes(db_connection: sqlite3.Connection, refresh_mac: bool):
