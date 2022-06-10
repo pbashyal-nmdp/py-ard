@@ -37,24 +37,73 @@ def get_imgt_version(imgt_version):
     return None
 
 
+def get_gl_string(args):
+    if args.gl_string_arg:
+        return args.gl_string_arg
+    if args.gl_string:
+        return args.gl_string
+
+    print("No GL String provided")
+    print(usage())
+    exit(1)
+
+
+def usage() -> str:
+    return """pyard
+        [--imgt-version <IMGT DB Version>]
+        [--data-dir <directory for db file>]
+        [--gl <gl-string>]
+        [--r <redux_type>]
+        [gl-string redux_type]"""
+
+
+def get_redux_type(args):
+    if args.redux_type_arg:
+        return args.redux_type_arg
+
+    if args.redux_type:
+        return args.redux_type
+
+    return None
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        usage="""[-v <IMGT DB Version>] [gl-string redux_type]""",
+        usage=usage(),
         description="""py-ard tool to redux GL String""",
     )
-    parser.add_argument("-v", "--imgt-version", dest="imgt_version")
-    parser.add_argument("--gl", required=True, dest="gl_string")
+    parser.add_argument("gl_string", type=str, nargs="?")
+    parser.add_argument("redux_type", type=str, nargs="?")
+    parser.add_argument("--imgt-version", required=False, dest="imgt_version")
+    parser.add_argument("--data-dir", required=False, dest="data_dir")
+    parser.add_argument("--gl", required=False, dest="gl_string_arg")
     parser.add_argument(
-        "-r", choices=pyard.pyard.reduction_types, required=True, dest="redux_type"
+        "-r", choices=pyard.pyard.reduction_types, required=False, dest="redux_type_arg"
     )
 
     args = parser.parse_args()
 
     imgt_version = get_imgt_version(args.imgt_version)
-    if imgt_version:
-        ard = pyard.ARD(imgt_version)
-    else:
-        ard = pyard.ARD()
+    data_dir = args.data_dir
 
-    print(ard.redux_gl(args.gl_string, args.redux_type))
+    gl_string = get_gl_string(args)
+    redux_type = get_redux_type(args)
+
+    if imgt_version:
+        if data_dir:
+            ard = pyard.ARD(imgt_version=imgt_version, data_dir=data_dir)
+        else:
+            ard = pyard.ARD(imgt_version=imgt_version)
+    else:
+        if data_dir:
+            ard = pyard.ARD(data_dir=data_dir)
+        else:
+            ard = pyard.ARD()
+
+    if redux_type:
+        print(ard.redux_gl(gl_string, redux_type))
+    else:
+        for redux_type in pyard.pyard.reduction_types:
+            print(f"{redux_type:3}: \t{ard.redux_gl(gl_string, redux_type)}")
+
     del ard
