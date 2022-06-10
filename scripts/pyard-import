@@ -77,18 +77,29 @@ def show_imgt_db_versions():
                 print()
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        usage="""pyard-status
-        [--db-version <IMGT DB Version>]
-        [--data-dir <directory for db file>]
-        [--v2-to-v3-mapping <V2 to V3 mapping CSV file>]
-        """,
-        description="""
+def usage():
+    return """pyard-status
+            [--db-version <IMGT DB Version>]
+            [--data-dir <directory for db file>]
+            [--v2-to-v3-mapping <V2 to V3 mapping CSV file>]
+            [--refresh-mac]
+            [--re-install]
+            [--show-versions]
+            """
+
+
+def description():
+    return """
         py-ard tool to generate reference SQLite database.
-        Allows updating db with custom V2 to V3 mappings.
-        """,
-    )
+        Update with custom V2 to V3 mappings.
+        Refresh the MAC Codes
+        Reinstall everything
+        Show versions of all available IMGT databases
+        """
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(usage=usage(), description=description())
     parser.add_argument("--db-version", dest="imgt_version")
     parser.add_argument("--data-dir", dest="data_dir")
     parser.add_argument("--v2-to-v3-mapping", dest="v2_v3_mapping")
@@ -99,13 +110,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     imgt_version = get_imgt_version(args.imgt_version)
-    # print(imgt_version)
-
     data_dir = get_data_dir(args.data_dir)
-    # print(data_dir)
 
     v2_to_v3_dict = get_v2_v3_mapping(args.v2_v3_mapping)
-    # print(len(v2_to_v3_dict))
 
     if args.reinstall:
         print(f"Reinstalling Version: {imgt_version}")

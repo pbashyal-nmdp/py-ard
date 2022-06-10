@@ -170,10 +170,24 @@ def create_drbx(row, locus_in_allele_name):
     return drbx.map_drbx(row.values, locus_in_allele_name)
 
 
+def usage():
+    return """
+    pyard-reduce-csv -c reduce_conf.json
+    """
+
+
+def description():
+    return """
+        Batch reduce a CSV file based on a config file.
+        See https://github.com/nmdp-bioinformatics/py-ard/tree/master/extras
+        for description of the configuration file.
+        """
+
+
 if __name__ == "__main__":
 
     # config is specified with a -c parameter
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(usage=usage(), description=description())
     parser.add_argument("-c", "--config", help="JSON Configuration file", required=True)
 
     args = parser.parse_args()

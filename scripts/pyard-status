@@ -40,14 +40,22 @@ def get_data_dir(data_dir):
     return data_dir
 
 
+def usage():
+    return """
+        [--data-dir <directory for db file>]
+        """
+
+
+def description():
+    return """
+        py-ard tool to provide a status report for reference SQLite databases.
+        """
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        usage="""
-        [--data-dir <directory for db file>]\n
-        """,
-        description="""
-        py-ard tool to provide a status report for reference SQLite databases.
-        """,
+        usage=usage(),
+        description=description(),
     )
     parser.add_argument("--data-dir", dest="data_dir")
     args = parser.parse_args()
@@ -64,7 +72,6 @@ if __name__ == "__main__":
             db_connection = db.create_db_connection(data_dir, imgt_version)
             print("-" * 43)
             print(f"IMGT DB Version: {imgt_version}")
-            print(f"File: {data_dir}/{filename}")
             print("-" * 43)
             print(f"|{'Table Name':20}|{'Rows':20}|")
             print(f"|{'-' * 41}|")

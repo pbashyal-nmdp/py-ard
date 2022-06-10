@@ -52,8 +52,7 @@ def usage() -> str:
     return """pyard
         [--imgt-version <IMGT DB Version>]
         [--data-dir <directory for db file>]
-        [--gl <gl-string>]
-        [--r <redux_type>]
+        [--gl <gl-string> --r <redux_type>]
         [gl-string redux_type]"""
 
 
@@ -70,7 +69,7 @@ def get_redux_type(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         usage=usage(),
-        description="""py-ard tool to redux GL String""",
+        description="""py-ard tool to reduce GL String""",
     )
     parser.add_argument("gl_string", type=str, nargs="?")
     parser.add_argument("redux_type", type=str, nargs="?")
