@@ -22,8 +22,9 @@
 #    > http://www.opensource.org/licenses/lgpl-license.php
 #
 import argparse
+import json
 import pathlib
-
+from urllib import request
 import pyard
 from pyard import db, data_repository
 import pandas as pd
@@ -60,11 +61,29 @@ def get_v2_v3_mapping(v2_v3_mapping):
     return None
 
 
+def show_imgt_db_versions():
+    imgt_github_url = "https://api.github.com/repos/ANHIG/IMGTHLA/branches?per_page=100"
+    req = request.Request(
+        imgt_github_url, headers={"Accept": "application/json"}, method="GET"
+    )
+    response = request.urlopen(req, timeout=10)
+
+    if response.status == 200:
+        json_body = json.loads(response.read())
+        print("Following versions of IMGT HLA Database are available:")
+        for i, branch in enumerate(json_body, start=1):
+            print(f"{branch['name']:10}", end=" ")
+            if i % 5 == 0:
+                print()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        usage="""[--db-version <IMGT DB Version>]\n
-        [--data-dir <directory for db file>]\n
-        [--v2-to-v3-mapping <V2 to V3 mapping CSV file>]""",
+        usage="""pyard-status
+        [--db-version <IMGT DB Version>]
+        [--data-dir <directory for db file>]
+        [--v2-to-v3-mapping <V2 to V3 mapping CSV file>]
+        """,
         description="""
         py-ard tool to generate reference SQLite database.
         Allows updating db with custom V2 to V3 mappings.
@@ -75,6 +94,8 @@ if __name__ == "__main__":
     parser.add_argument("--v2-to-v3-mapping", dest="v2_v3_mapping")
     parser.add_argument("--refresh-mac", dest="refresh_mac", action="store_true")
     parser.add_argument("--re-install", dest="reinstall", action="store_true")
+    parser.add_argument("--show-versions", dest="show_versions", action="store_true")
+
     args = parser.parse_args()
 
     imgt_version = get_imgt_version(args.imgt_version)
@@ -115,3 +136,6 @@ if __name__ == "__main__":
         db_connection = db.create_db_connection(data_dir, imgt_version, ro=False)
         data_repository.generate_mac_codes(db_connection, True)
         print(f"Updated MACs for {imgt_version} IMGT database.")
+
+    if args.show_versions:
+        show_imgt_db_versions()
