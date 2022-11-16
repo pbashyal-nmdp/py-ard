@@ -14,18 +14,53 @@
     "r_dpb1_typ1",
     "r_dpb1_typ2"
   ],
-  "columns_to_reduce_in_csv": [
-    "r_a_typ1",
-    "r_a_typ2",
-    "r_b_typ1",
-    "r_b_typ2",
-    "r_c_typ1",
-    "r_c_typ2",
-    "r_drb1_typ1",
-    "r_drb1_typ2",
-    "r_dpb1_typ1",
-    "r_dpb1_typ2"
-  ],
+  "loci_columns_map": {
+    "recipient": {
+      "HLA-A": [
+        "r_a_typ1",
+        "r_a_typ2"
+      ],
+      "HLA-B": [
+        "r_b_typ1",
+        "r_b_typ2"
+      ],
+      "HLA-C": [
+        "r_c_typ1",
+        "r_c_typ2"
+      ],
+      "HLA-DRB1": [
+        "r_drb1_typ1",
+        "r_drb1_typ2"
+      ],
+      "HLA-DPB1": [
+        "r_dpb1_typ1",
+        "r_dpb1_typ2"
+      ]
+    },
+    "donor": {
+      "HLA-A": [
+        "d_a_typ1",
+        "d_a_typ2"
+      ],
+      "HLA-B": [
+        "d_b_typ1",
+        "d_b_typ2"
+      ],
+      "HLA-C": [
+        "d_c_typ1",
+        "d_c_typ2"
+      ],
+      "HLA-DRB1": [
+        "d_drb1_typ1",
+        "d_drb1_typ2"
+      ],
+      "HLA-DPB1": [
+        "d_dpb1_typ1",
+        "d_dpb1_typ2"
+      ]
+    }
+  },
+  "glstring": true,
   "redux_type": "lgx",
   "reduce_serology": false,
   "reduce_v2": true,

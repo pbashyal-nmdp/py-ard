@@ -39,6 +39,27 @@ import pyard
 import pyard.drbx as drbx
 from pyard.exceptions import PyArdError
 
+# default config
+config = {
+    "apply_compression": "gzip",
+    "convert_v2_to_v3": False,
+    "keep_locus_in_allele_name": True,
+    "glstring": False,
+    "locus_in_allele_name": False,
+    "map_drb345_to_drbx": False,
+    "new_column_for_redux": True,
+    "output_file_format": "csv",
+    "reduce_2field": True,
+    "reduce_3field": True,
+    "reduce_MAC": True,
+    "reduce_P": True,
+    "reduce_XX": False,
+    "reduce_serology": False,
+    "reduce_v2": True,
+    "redux_type": "lgx",
+    "verbose_log": True,
+}
+
 
 def is_serology(allele: str) -> bool:
     return ard.is_serology(allele)
@@ -70,29 +91,29 @@ def is_P(allele: str) -> bool:
 
 def should_be_reduced(allele, locus_allele):
     if is_serology(allele):
-        return ard_config["reduce_serology"]
+        return config["reduce_serology"]
 
-    if ard_config["reduce_v2"]:
+    if config["reduce_v2"]:
         if ard.is_v2(locus_allele):
             return True
 
-    if ard_config["reduce_2field"]:
+    if config["reduce_2field"]:
         if is_2field(locus_allele):
             return True
 
-    if ard_config["reduce_3field"]:
+    if config["reduce_3field"]:
         if is_3field(locus_allele):
             return True
 
-    if ard_config["reduce_P"]:
+    if config["reduce_P"]:
         if is_P(allele):
             return True
 
-    if ard_config["reduce_XX"]:
+    if config["reduce_XX"]:
         if ard.is_XX(locus_allele):
             return True
 
-    if ard_config["reduce_MAC"]:
+    if config["reduce_MAC"]:
         if ard.is_mac(locus_allele) and not ard.is_XX(locus_allele):
             return True
 
@@ -109,7 +130,7 @@ def reduce(allele, locus, column_name):
         return allele
     if "*" in allele:
         locus_allele = allele
-    elif ard_config["locus_in_allele_name"]:
+    elif config["locus_in_allele_name"]:
         locus_allele = allele
     else:
         locus_allele = f"{locus}*{allele}"
@@ -118,7 +139,7 @@ def reduce(allele, locus, column_name):
     if should_be_reduced(allele, locus_allele):
         # print(f"reducing '{locus_allele}'")
         try:
-            reduced_allele = ard.redux_gl(locus_allele, ard_config["redux_type"])
+            reduced_allele = ard.redux_gl(locus_allele, config["redux_type"])
         except PyArdError as e:
             if verbose:
                 print(e)
@@ -128,7 +149,7 @@ def reduce(allele, locus, column_name):
             return allele
         # print(f"reduced to '{reduced_allele}'")
         if reduced_allele:
-            if ard_config["keep_locus_in_allele_name"]:
+            if config["keep_locus_in_allele_name"]:
                 allele = reduced_allele
             else:
                 allele = remove_locus_name(reduced_allele)
@@ -138,16 +159,16 @@ def reduce(allele, locus, column_name):
         if verbose:
             print(f"\t{locus_allele} => {allele}")
     else:
-        if ard_config["convert_v2_to_v3"]:
+        if config["convert_v2_to_v3"]:
             if ard.is_v2(locus_allele):
                 v3_allele = ard.v2_to_v3(locus_allele)
-                if not ard_config["keep_locus_in_allele_name"]:
+                if not config["keep_locus_in_allele_name"]:
                     allele = remove_locus_name(v3_allele)
                 else:
                     allele = v3_allele
                 if verbose:
                     print(f"\t{locus_allele} => {allele}")
-        elif ard_config["keep_locus_in_allele_name"]:
+        elif config["keep_locus_in_allele_name"]:
             allele = locus_allele
 
     return allele
@@ -170,6 +191,27 @@ def create_drbx(row, locus_in_allele_name):
     return drbx.map_drbx(row.values, locus_in_allele_name)
 
 
+def apply_compression(config):
+    if config["apply_compression"]:
+        return config["apply_compression"] in ["zip", "gzip"]
+    return False
+
+
+def create_slug(row):
+    allele1 = row[0]
+    allele2 = row[1]
+    if allele1 and allele2:
+        slug = allele1 + "+" + allele2
+    elif allele1:
+        slug = allele1
+    elif allele2:
+        slug = allele2
+    else:
+        slug = ""
+
+    return slug
+
+
 if __name__ == "__main__":
 
     # config is specified with a -c parameter
@@ -183,10 +225,13 @@ if __name__ == "__main__":
     with open(config_filename) as conf_file:
         ard_config = json.load(conf_file)
 
-    verbose = ard_config["verbose_log"]
+    # Override the default config file with anything in the config file
+    config.update(ard_config)
+
+    verbose = config["verbose_log"]
     white_space_regex = re.compile(r"\s+")
 
-    if ard_config["output_file_format"] == "xlsx":
+    if config["output_file_format"] == "xlsx":
         try:
             import openpyxl
         except ImportError:
@@ -205,21 +250,31 @@ if __name__ == "__main__":
     # Header is the first row
     # Don't convert to NAs
     df = pd.read_csv(
-        ard_config["in_csv_filename"],
-        usecols=ard_config["columns_from_csv"],
+        config["in_csv_filename"],
+        usecols=config["columns_from_csv"],
         header=0,
         dtype=str,
         keep_default_na=False,
     )
 
+    # Get all the columns to reduce
+    columns_to_reduce_in_csv = []
+    subject_types = config["loci_columns_map"]
+    for subject in subject_types:
+        loci_columns = subject_types[subject]
+        for locus in loci_columns:
+            columns_to_reduce_in_csv += loci_columns[locus]
+
     failed_to_reduce_alleles = []
+    reduced_column_names = []  # keep track of reduced columns
     # Reduce each of the specified columns
-    for column in ard_config["columns_to_reduce_in_csv"]:
+    for column in columns_to_reduce_in_csv:
         if verbose:
             print(f"Column:{column} =>")
-        if ard_config["new_column_for_redux"]:
+        if config["new_column_for_redux"]:
             # insert a new column
             new_column_name = f"reduced_{column}"
+            reduced_column_names.append(new_column_name)
             new_column_index = df.columns.get_loc(column) + 1
             # Apply clean_locus function to the column and insert as a new column
             df.insert(
@@ -230,31 +285,47 @@ if __name__ == "__main__":
         else:
             # Apply clean_locus function to the column and replace the column
             df[column] = df[column].apply(clean_locus, column_name=column)
+            reduced_column_names.append(column)
 
     # Map DRB3,DRB4,DRB5 to DRBX if specified
     # New columns DRBX_1 and DRBX_2 are created
-    if ard_config["map_drb345_to_drbx"]:
+    if config["map_drb345_to_drbx"]:
         drbx_loci = ["DRB3", "DRB4", "DRB5"]
         drbx_columns = [
             col_name for col_name in df.columns if col_name.split("_")[1] in drbx_loci
         ]
         if len(drbx_columns) == len(drbx_loci) * 2:  # For Type1/Type2
-            locus_in_allele_name = ard_config["keep_locus_in_allele_name"]
+            locus_in_allele_name = config["keep_locus_in_allele_name"]
             df_drbx = df[drbx_columns].apply(
                 create_drbx, axis=1, args=(locus_in_allele_name,)
             )
             df["DRBX_1"], df["DRBX_2"] = zip(*df_drbx)
 
+    if config["glstring"]:
+        # A new DF to combine SLUGs
+        subject_types = config["loci_columns_map"]
+        for subject in subject_types:
+            loci_columns = subject_types[subject]
+            gl_df = pd.DataFrame(columns=loci_columns.keys())
+            for locus in loci_columns:
+                # Use SLUG separator +
+                gl_df[locus] = df[
+                    [loci_columns[locus][0], loci_columns[locus][1]]
+                ].apply(create_slug, axis=1)
+
+            # Create GL String by combining SLUGs with ^ separator
+            df[subject + "_glstring"] = gl_df[loci_columns.keys()].agg("^".join, axis=1)
+
     # Save as XLSX if specified
-    if ard_config["output_file_format"] == "xlsx":
-        out_file_name = f"{ard_config['out_csv_filename']}.xlsx"
+    if config["output_file_format"] == "xlsx":
+        out_file_name = f"{config['out_csv_filename']}.xlsx"
         df.to_excel(out_file_name, index=False)
     else:
         # Save as compressed CSV
-        out_file_name = f"{ard_config['out_csv_filename'] + '.gz' if ard_config['apply_compression'] else ''}"
-        df.to_csv(
-            out_file_name, index=False, compression=ard_config["apply_compression"]
+        out_file_name = (
+            f"{config['out_csv_filename'] + '.gz' if apply_compression(config) else ''}"
         )
+        df.to_csv(out_file_name, index=False, compression=config["apply_compression"])
 
     if len(failed_to_reduce_alleles) == 0:
         print("No Errors", file=sys.stderr)
