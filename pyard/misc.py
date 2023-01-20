@@ -1,4 +1,6 @@
 # List of expression characters
+from typing import List
+
 expression_chars = ["N", "Q", "L", "S"]
 # List of P and G characters
 PandG_chars = ["P", "G"]
@@ -64,3 +66,17 @@ def get_P_name(a: str) -> str:
     if last_char in PandG_chars + expression_chars:
         a = a[:-1]
     return ":".join(a.split(":")[0:2]) + "P"
+
+
+def get_imgt_db_versions() -> List[str]:
+    import urllib.request
+    import json
+
+    req = urllib.request.Request(
+        url="https://api.github.com/repos/ANHIG/IMGTHLA/branches?per_page=100"
+    )
+    res = urllib.request.urlopen(req, timeout=5)
+    if res.status == 200:
+        json_body = json.loads(res.read())
+        versions = list(map(lambda x: x["name"], json_body))
+        return versions

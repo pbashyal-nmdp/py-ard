@@ -23,10 +23,10 @@
 #
 import argparse
 import pathlib
+import sys
 
 import pyard
 from pyard import db, data_repository
-import pandas as pd
 
 
 def get_imgt_version(imgt_version):
@@ -52,6 +52,8 @@ def get_data_dir(data_dir):
 
 def get_v2_v3_mapping(v2_v3_mapping):
     if v2_v3_mapping:
+        import pandas as pd
+
         path = pathlib.Path(v2_v3_mapping)
         if not path.exists() or not path.is_file():
             raise RuntimeError(f"{data_dir} is not a valid file")
@@ -62,20 +64,51 @@ def get_v2_v3_mapping(v2_v3_mapping):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        usage="""[--db-version <IMGT DB Version>]\n
-        [--data-dir <directory for db file>]\n
-        [--v2-to-v3-mapping <V2 to V3 mapping CSV file>]""",
         description="""
         py-ard tool to generate reference SQLite database.
         Allows updating db with custom V2 to V3 mappings.
+        Displays the list of available IMGT database versions.
         """,
     )
-    parser.add_argument("--db-version", dest="imgt_version")
-    parser.add_argument("--data-dir", dest="data_dir")
-    parser.add_argument("--v2-to-v3-mapping", dest="v2_v3_mapping")
-    parser.add_argument("--refresh-mac", dest="refresh_mac", action="store_true")
-    parser.add_argument("--re-install", dest="reinstall", action="store_true")
+    parser.add_argument(
+        "--list",
+        dest="show_versions",
+        action="store_true",
+        help="Show Versions of available IMGT Databases",
+    )
+    parser.add_argument(
+        "--db-version",
+        dest="imgt_version",
+        help="Import supplied IMGT_VERSION DB Version",
+    )
+    parser.add_argument(
+        "--data-dir",
+        dest="data_dir",
+        help="Data directory where the imported data is stored",
+    )
+    parser.add_argument(
+        "--v2-to-v3-mapping", dest="v2_v3_mapping", help="V2 to V3 mapping CSV file"
+    )
+    parser.add_argument(
+        "--refresh-mac",
+        dest="refresh_mac",
+        action="store_true",
+        help="Only refresh MAC data",
+    )
+    parser.add_argument(
+        "--re-install",
+        dest="reinstall",
+        action="store_true",
+        help="reinstall a fresh version of database",
+    )
     args = parser.parse_args()
+
+    if args.show_versions:
+        versions = pyard.db_versions()
+        print("Available IMGT Versions:")
+        for version in versions:
+            print(f"  {version}")
+        sys.exit(0)
 
     imgt_version = get_imgt_version(args.imgt_version)
     # print(imgt_version)

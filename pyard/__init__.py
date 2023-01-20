@@ -23,6 +23,7 @@
 #
 from .pyard import ARD
 from .blender import blender as dr_blender
+from .misc import get_imgt_db_versions as db_versions
 
 __author__ = """NMDP Bioinformatics"""
 __version__ = "0.8.3"
