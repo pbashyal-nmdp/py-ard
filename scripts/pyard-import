@@ -27,6 +27,7 @@ import sys
 
 import pyard
 from pyard import db, data_repository
+from pyard.misc import get_data_dir
 
 
 def get_imgt_version(imgt_version):
@@ -38,16 +39,6 @@ def get_imgt_version(imgt_version):
             f"{imgt_version} is not a valid IMGT database version number"
         )
     return "Latest"
-
-
-def get_data_dir(data_dir):
-    if data_dir:
-        path = pathlib.Path(data_dir)
-        if not path.exists() or not path.is_dir():
-            raise RuntimeError(f"{data_dir} is not a valid directory")
-    else:
-        data_dir = db.get_pyard_db_install_directory()
-    return data_dir
 
 
 def get_v2_v3_mapping(v2_v3_mapping):
@@ -84,7 +75,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data-dir",
         dest="data_dir",
-        help="Data directory where the imported data is stored",
+        help="Data directory to store imported data",
     )
     parser.add_argument(
         "--v2-to-v3-mapping", dest="v2_v3_mapping", help="V2 to V3 mapping CSV file"
