@@ -23,7 +23,6 @@
 import os
 import pathlib
 import sqlite3
-import tempfile
 from typing import Tuple, Dict, Set, List
 
 from pyard.misc import get_imgt_db_versions
@@ -52,7 +51,7 @@ def create_db_connection(data_dir, imgt_version, ro=False):
     """
     # Set data directory where all the downloaded files will go
     if data_dir is None:
-        data_dir = get_pyard_db_default_directory()
+        data_dir = get_default_db_directory()
 
     db_filename = f"{data_dir}/pyard-{imgt_version}.sqlite3"
 
