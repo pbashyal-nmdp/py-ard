@@ -385,6 +385,10 @@ class ARD(object):
                     alleles = ["HLA-" + a for a in alleles]
                 else:
                     alleles = self._get_alleles(code, loc_antigen)
+                if not alleles:
+                    raise InvalidMACError(
+                        f"{glstring} does not expand to valid alleles."
+                    )
                 return self.redux("/".join(alleles), redux_type)
             else:
                 raise InvalidMACError(f"{glstring} is an invalid MAC.")
