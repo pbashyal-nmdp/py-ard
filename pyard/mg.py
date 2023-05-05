@@ -4,6 +4,10 @@ import pyard
 
 ard = pyard.init()
 
+mg_hierarchy = {"HM": 4, "Hmm": 3, "IM": 2, "Imm": 1}
+
+mg_reverse = {4: "HM", 3: "Hmm", 2: "IM", 1: "Imm"}
+
 
 def calculate_research_mg(allele_gl_1, allele_gl_2) -> str:
     """
@@ -72,6 +76,41 @@ def research_mg(allele1, allele2) -> str:
 
 
 if __name__ == "__main__":
-    p = list(product(["A*02:01"], ["A*02:01", "A*02:05"]))
-    for i in p:
-        print(research_mg(i[0], i[1]))
+    """
+    A row from HLA SAVE
+      | R_TYP1        | R_TYP2        | D_TYP1        | D_TYP2        | DNA_MG   |
+      | A*01:01       | A*68:01       | A*02:01:01    | A*68:01:02:01 | Imm:HM   |
+
+      13:02,35:03,35:03,15:XX
+    """
+
+    recipient = {"R_TYP1": "B*13:02", "R_TYP2": "B*35:03"}
+
+    donor = {"D_TYP1": "B*35:03", "D_TYP2": "B*15:XX"}
+
+    recip1_donor = list(
+        product([recipient["R_TYP1"]], [donor["D_TYP1"], donor["D_TYP2"]])
+    )
+    match_grades = []
+    for r_d_pair in recip1_donor:
+        print(r_d_pair)
+        mg = research_mg(r_d_pair[0], r_d_pair[1])
+        match_grades.append(mg)
+        print(mg)
+
+    mg_val1 = max(mg_hierarchy[match_grades[0]], mg_hierarchy[match_grades[1]])
+    print(f"{match_grades} Match Grade: {mg_val1}")
+
+    recip2_donor = list(
+        product([recipient["R_TYP2"]], [donor["D_TYP1"], donor["D_TYP2"]])
+    )
+    match_grades = []
+    for r_d_pair in recip2_donor:
+        print(r_d_pair)
+        mg = research_mg(r_d_pair[0], r_d_pair[1])
+        match_grades.append(mg)
+        print(mg)
+    mg_val2 = max(mg_hierarchy[match_grades[0]], mg_hierarchy[match_grades[1]])
+    print(f"{match_grades} Match Grade: {mg_val2}")
+
+    print(f"{mg_reverse[mg_val1]}:{mg_reverse[mg_val2]}")
