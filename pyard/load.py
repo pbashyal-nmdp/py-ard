@@ -153,7 +153,7 @@ def load_allele_list(imgt_version):
     :return: pandas Dataframe of Alleles
     """
 
-    # Create a Pandas DataFrame from the mac_code list file
+    # Create a Pandas DataFrame from the AlleleList file
     # Skip the header (first 6 lines) and use only the Allele column
     if imgt_version == "Latest":
         allele_list_url = f"{IMGT_HLA_URL}Latest/Allelelist.txt"
