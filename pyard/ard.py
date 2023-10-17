@@ -114,7 +114,9 @@ class ARD(object):
         broad_splits.broad_splits_ser_mapping = (
             dr.generate_serology_broad_split_mapping(self.db_connection, imgt_version)
         )
-        dr.generate_serology_mapping(self.db_connection, imgt_version)
+        dr.generate_serology_mapping(
+            self.db_connection, imgt_version, self._redux_allele
+        )
         # Load V2 to V3 mappings
         dr.generate_v2_to_v3_mapping(self.db_connection, imgt_version)
         # Save IMGT database version
@@ -123,9 +125,6 @@ class ARD(object):
         dr.generate_mac_codes(self.db_connection, refresh_mac=False, load_mac=load_mac)
         # Load CIWD mapping
         dr.generate_cwd_mapping(self.db_connection)
-
-        # Close the current read-write db connection
-        self.db_connection.close()
 
         # Adjust the cache for redux
         if max_cache_size != DEFAULT_CACHE_SIZE:
@@ -146,6 +145,9 @@ class ARD(object):
             import gc
 
             gc.freeze()
+
+        # Close the current read-write db connection
+        self.db_connection.close()
 
         # Re-open the connection in read-only mode as we're not updating it anymore
         self.db_connection, _ = db.create_db_connection(data_dir, imgt_version, ro=True)
@@ -268,17 +270,19 @@ class ARD(object):
                 # If ambiguous, reduce to G group level
                 return self._redux_allele(allele, "lgx")
         elif redux_type == "S":
+            # reduce allele to ARD level
+            lgx_allele = self._redux_allele(allele, "lgx", re_ping)
             # find serology equivalent in serology_mapping
-            serology_mapping = db.find_serology_for_allele(self.db_connection, allele)
+            # look for lgx_allele as a wildcard in the allele list
+            serology_mapping = db.find_serology_for_allele(
+                self.db_connection, lgx_allele
+            )
+            # Verify that the actual allele is in allele list, if so keep track of
+            # mapped serology
             serology_set = set()
             for serology, allele_list in serology_mapping.items():
-                if allele in allele_list.split("/"):
+                if lgx_allele in allele_list.split("/"):
                     serology_set.add(serology)
-            if not serology_set and is_2_field_allele(allele):
-                for serology, allele_list in serology_mapping.items():
-                    allele_list_lgx = self.redux(allele_list, "lgx")
-                    if allele in allele_list_lgx.split("/"):
-                        serology_set.add(serology)
             return "/".join(
                 sorted(
                     serology_set, key=functools.cmp_to_key(self.smart_sort_comparator)

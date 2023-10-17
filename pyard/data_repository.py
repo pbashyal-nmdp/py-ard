@@ -354,7 +354,9 @@ def to_serological_name(locus_name: str):
     return sero_name
 
 
-def generate_serology_mapping(db_connection: sqlite3.Connection, imgt_version):
+def generate_serology_mapping(
+    db_connection: sqlite3.Connection, imgt_version, redux_function
+):
     if not db.table_exists(db_connection, "serology_mapping"):
         df_sero = load_serology_mappings(imgt_version)
 
@@ -388,9 +390,14 @@ def generate_serology_mapping(db_connection: sqlite3.Connection, imgt_version):
             to_serological_name
         )
 
+        sero_mapping_combined["lgx"] = sero_mapping_combined["Allele"].apply(
+            lambda allele: redux_function(allele, "lgx")
+        )
+
+        # Create a serology to lgx reduced allele list mapping
         sero_mapping = (
             sero_mapping_combined.groupby("Sero")
-            .apply(lambda x: "/".join(sorted(x["Allele"])))
+            .apply(lambda x: "/".join(set(x["lgx"])))
             .to_dict()
         )
 
