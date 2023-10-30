@@ -610,9 +610,13 @@ yes
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 [1.0.6]: https://github.com/nmdp-bioinformatics/py-ard/compare/1.0.5...1.0.6
 =======
 >>>>>>> e21929d (Update changelog for "1.0.5")
+=======
+[1.0.6]: https://github.com/nmdp-bioinformatics/py-ard/compare/1.0.5...1.0.6
+>>>>>>> 6543b8d (Update changelog for "1.0.6")
 [1.0.5]: https://github.com/nmdp-bioinformatics/py-ard/compare/1.0.4...1.0.5
 [1.0.4]: https://github.com/nmdp-bioinformatics/py-ard/compare/1.0.3...1.0.4
 [1.0.3]: https://github.com/nmdp-bioinformatics/py-ard/compare/1.0.2...1.0.3
