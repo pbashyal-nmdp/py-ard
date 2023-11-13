@@ -74,7 +74,7 @@ class ARD(object):
 
     def __init__(
         self,
-        imgt_version: str = "Latest",
+        ipd_version: str = "Latest",
         data_dir: str = None,
         load_mac: bool = True,
         max_cache_size: int = DEFAULT_CACHE_SIZE,
@@ -82,10 +82,10 @@ class ARD(object):
     ):
         """
         ARD will load valid alleles, xx codes and MAC mappings for the given
-        version of IMGT database, downloading and generating the database if
-        not already present.
+        version of IPD-IMGT/HLA database, downloading and generating
+        the database if not already present.
 
-        :param imgt_version: IMGT HLA database version
+        :param ipd_version: IPD-IMGT/HLA database version
         :param data_dir: directory path to store cached data
         :param config: directory of configuration options
         """
@@ -95,16 +95,16 @@ class ARD(object):
             self._config.update(config)
 
         # Create a database connection for writing
-        self.db_connection, _ = db.create_db_connection(data_dir, imgt_version)
+        self.db_connection, _ = db.create_db_connection(data_dir, ipd_version)
 
         # Load ARD mappings
-        self.ars_mappings = dr.generate_ard_mapping(self.db_connection, imgt_version)
+        self.ars_mappings = dr.generate_ard_mapping(self.db_connection, ipd_version)
         # Load Alleles and XX Codes
         (
             self.code_mappings,
             self.allele_group,
         ) = dr.generate_alleles_and_xx_codes_and_who(
-            self.db_connection, imgt_version, self.ars_mappings
+            self.db_connection, ipd_version, self.ars_mappings
         )
 
         # Generate short nulls from WHO mapping
@@ -114,13 +114,13 @@ class ARD(object):
 
         # Load Serology mappings
         broad_splits.broad_splits_ser_mapping = (
-            dr.generate_serology_broad_split_mapping(self.db_connection, imgt_version)
+            dr.generate_serology_broad_split_mapping(self.db_connection, ipd_version)
         )
-        dr.generate_serology_mapping(self.db_connection, imgt_version)
+        dr.generate_serology_mapping(self.db_connection, ipd_version)
         # Load V2 to V3 mappings
-        dr.generate_v2_to_v3_mapping(self.db_connection, imgt_version)
-        # Save IMGT database version
-        dr.set_db_version(self.db_connection, imgt_version)
+        dr.generate_v2_to_v3_mapping(self.db_connection, ipd_version)
+        # Save IPD-IMGT/HLA database version
+        dr.set_db_version(self.db_connection, ipd_version)
         # Load MAC codes
         dr.generate_mac_codes(self.db_connection, refresh_mac=False, load_mac=load_mac)
         # Load CIWD mapping
@@ -150,7 +150,7 @@ class ARD(object):
             gc.freeze()
 
         # Re-open the connection in read-only mode as we're not updating it anymore
-        self.db_connection, _ = db.create_db_connection(data_dir, imgt_version, ro=True)
+        self.db_connection, _ = db.create_db_connection(data_dir, ipd_version, ro=True)
 
     def __del__(self):
         """
@@ -554,7 +554,7 @@ class ARD(object):
 
     def _is_who_allele(self, allele):
         """
-        Test if allele is a WHO allele in the current imgt database
+        Test if allele is a WHO allele in the current IPD-IMGT/HLA database
         :param allele: Allele to test
         :return: bool to indicate if allele is valid
         """
@@ -562,7 +562,7 @@ class ARD(object):
 
     def _is_valid_allele(self, allele):
         """
-        Test if allele is valid in the current imgt database
+        Test if allele is valid in the current IPD-IMGT/HLA database
         :param allele: Allele to test
         :return: bool to indicate if allele is valid
         """
@@ -826,14 +826,14 @@ class ARD(object):
 
     def refresh_mac_codes(self) -> None:
         """
-        Refreshes MAC code for the current IMGT db version.
+        Refreshes MAC code for the current IPD-IMGT/HLA db version.
         :return: None
         """
         dr.generate_mac_codes(self.db_connection, refresh_mac=True)
 
     def get_db_version(self) -> str:
         """
-        Get the IMGT DB Version Number
+        Get the IPD-IMGT/HLA DB Version Number
         @return:
         """
         return dr.get_db_version(self.db_connection)

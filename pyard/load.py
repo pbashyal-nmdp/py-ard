@@ -25,8 +25,8 @@ from urllib.error import URLError
 
 from pyard.misc import get_G_name, get_2field_allele, get_3field_allele, get_P_name
 
-# GitHub URL where IMGT HLA files are downloaded.
-IMGT_HLA_URL = "https://raw.githubusercontent.com/ANHIG/IMGTHLA/"
+# GitHub URL where IPD-IMGT/HLA files are downloaded.
+IPD_IMGT_HLA_URL = "https://raw.githubusercontent.com/ANHIG/IMGTHLA/"
 
 
 def add_locus_name(locus: str, splits: str) -> List:
@@ -38,10 +38,10 @@ def add_locus_name(locus: str, splits: str) -> List:
 # Derived from rel_ser_ser.txt
 # https://raw.githubusercontent.com/ANHIG/IMGTHLA/Latest/wmda/rel_ser_ser.txt
 #
-def load_serology_broad_split_mapping(imgt_version: str) -> Dict:
+def load_serology_broad_split_mapping(ipd_version: str) -> Dict:
     import pandas as pd
 
-    ser_ser_url = f"{IMGT_HLA_URL}{imgt_version}/wmda/rel_ser_ser.txt"
+    ser_ser_url = f"{IPD_IMGT_HLA_URL}{ipd_version}/wmda/rel_ser_ser.txt"
     try:
         df_p = pd.read_csv(
             ser_ser_url,
@@ -64,11 +64,11 @@ def load_serology_broad_split_mapping(imgt_version: str) -> Dict:
     return sero_mapping
 
 
-def load_g_group(imgt_version):
+def load_g_group(ipd_version):
     import pandas as pd
 
     # load the hla_nom_g.txt
-    ars_g_url = f"{IMGT_HLA_URL}{imgt_version}/wmda/hla_nom_g.txt"
+    ars_g_url = f"{IPD_IMGT_HLA_URL}{ipd_version}/wmda/hla_nom_g.txt"
     try:
         df = pd.read_csv(
             ars_g_url, skiprows=6, names=["Locus", "A", "G"], sep=";"
@@ -95,11 +95,11 @@ def load_g_group(imgt_version):
     return df
 
 
-def load_p_group(imgt_version):
+def load_p_group(ipd_version):
     import pandas as pd
 
     # load the hla_nom_p.txt
-    ars_p_url = f"{IMGT_HLA_URL}{imgt_version}/wmda/hla_nom_p.txt"
+    ars_p_url = f"{IPD_IMGT_HLA_URL}{ipd_version}/wmda/hla_nom_p.txt"
     # example: C*;06:06:01:01/06:06:01:02/06:271;06:06P
     try:
         df_p = pd.read_csv(
@@ -128,7 +128,7 @@ def load_p_group(imgt_version):
     return df_p
 
 
-def load_allele_list(imgt_version):
+def load_allele_list(ipd_version):
     """
     The format of the AlleleList file has a 6-line header with a header
     on the 7th line
@@ -149,20 +149,20 @@ def load_allele_list(imgt_version):
     HLA16436,A*01:01:01:07
     ```
 
-    :param imgt_version: IMGT database version
+    :param ipd_version: IPD-IMGT/HLA database version
     :return: pandas Dataframe of Alleles
     """
 
     # Create a Pandas DataFrame from the mac_code list file
     # Skip the header (first 6 lines) and use only the Allele column
-    if imgt_version == "Latest":
-        allele_list_url = f"{IMGT_HLA_URL}Latest/Allelelist.txt"
+    if ipd_version == "Latest":
+        allele_list_url = f"{IPD_IMGT_HLA_URL}Latest/Allelelist.txt"
     else:
-        if imgt_version == "3130":
+        if ipd_version == "3130":
             # 3130 was renamed to 3131 for Allelelist file only 🤷🏾‍
-            imgt_version = "3131"
+            ipd_version = "3131"
         allele_list_url = (
-            f"{IMGT_HLA_URL}Latest/allelelist/Allelelist.{imgt_version}.txt"
+            f"{IPD_IMGT_HLA_URL}Latest/allelelist/Allelelist.{ipd_version}.txt"
         )
     import pandas as pd
 
@@ -175,7 +175,7 @@ def load_allele_list(imgt_version):
     return allele_df
 
 
-def load_serology_mappings(imgt_version):
+def load_serology_mappings(ipd_version):
     """
     Read `rel_dna_ser.txt` file that contains alleles and their serological equivalents.
 
@@ -189,7 +189,7 @@ def load_serology_mappings(imgt_version):
 
     EAE is ignored when generating the serology map.
     """
-    rel_dna_ser_url = f"{IMGT_HLA_URL}{imgt_version}/wmda/rel_dna_ser.txt"
+    rel_dna_ser_url = f"{IPD_IMGT_HLA_URL}{ipd_version}/wmda/rel_dna_ser.txt"
     # Load WMDA serology mapping data from URL
     import pandas as pd
 

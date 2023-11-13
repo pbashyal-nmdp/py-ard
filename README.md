@@ -86,7 +86,7 @@ import pyard
 ```
 
 
-Initialize `ARD` object with a version of IMGT HLA database
+Initialize `ARD` object with a version of IPD-IMGT/HLA database
 
 ```python
 import pyard
@@ -111,7 +111,7 @@ import pyard.ard
 ard = pyard.init('3510', data_dir='/tmp/py-ard')
 ```
 
-As MAC data changes frequently, you can choose to refresh the MAC code for current IMGT HLA database version.
+As MAC data changes frequently, you can choose to refresh the MAC code for current IPD-IMGT/HLA database version.
 
 ```python
 ard.refresh_mac_codes()
@@ -232,7 +232,7 @@ ard.lookup_mac(ard.cwd_redux("B*15:01:01/B*15:01:03/B*15:04/B*15:07/B*15:26N/B*1
 
 Various command line interface (CLI) tools are available to use for managing local IPD-IMGT/HLA cache database, running impromptu reduction queries and batch processing of CSV files.
 
-For all tools, use `--imgt-version` and `--data-dir` to specify the IPD-IMGT/HLA database version and the directory where the SQLite files are created.
+For all tools, use `--ipd-version` and `--data-dir` to specify the IPD-IMGT/HLA database version and the directory where the SQLite files are created.
 
 ### `pyard-import` Import the latest IPD-IMGT/HLA database
 
@@ -243,14 +243,14 @@ Use `pyard-import -h` to see all the options available.
 $ pyard-import -h
 usage: pyard-import [-h] [--list] [-i IMGT_VERSION] [-d DATA_DIR] [--v2-to-v3-mapping V2_V3_MAPPING] [--refresh-mac] [--re-install] [--skip-mac]
 
-py-ard tool to generate reference SQLite database. Allows updating db with custom V2 to V3 mappings. Displays the list of available IMGT database
+py-ard tool to generate reference SQLite database. Allows updating db with custom V2 to V3 mappings. Displays the list of available IPD-IMGT/HLA database
 versions.
 
 options:
   -h, --help            show this help message and exit
-  --list                Show Versions of available IMGT Databases
-  -i IMGT_VERSION, --imgt-version IMGT_VERSION
-                        Import supplied IMGT_VERSION DB Version
+  --list                Show Versions of available IPD-IMGT/HLA Databases
+  -i IPD_VERSION, --ipd-version IPD_VERSION
+                        Import supplied IPD-IMGT/HLA DB Version
   -d DATA_DIR, --data-dir DATA_DIR
                         Data directory to store imported data
   --v2-to-v3-mapping V2_V3_MAPPING
@@ -267,29 +267,29 @@ $ pyard-import
 Created Latest py-ard database
 ```
 
-#### Import particular version of IMGT database
+#### Import particular version of IPD-IMGT/HLA database
 
 ```shell
 $ pyard-import --db-version 3.29.0
 Created py-ard version 3290 database
 ```
 
-Import particular version of IMGT database and replace the v2 to v3 mapping
+Import particular version of IPD-IMGT/HLA database and replace the v2 to v3 mapping
 table from a CSV file.
 
 ```shell
-$ pyard-import --imgt-version 3.29.0 --v2-to-v3-mapping map2to3.csv
+$ pyard-import --ipd-version 3.29.0 --v2-to-v3-mapping map2to3.csv
 Created py-ard version 3290 database
 Updated v2_mapping table with 'map2to3.csv' mapping file.
 ```
 
-#### Reinstall a particular IMGT database
+#### Reinstall a particular IPD-IMGT/HLA database
 
 ```shell
-pyard-import --imgt-version 3340 --re-install
+pyard-import --ipd-version 3340 --re-install
 ```
 
-#### Replace the Latest IMGT database with V2 mappings
+#### Replace the Latest IPD-IMGT/HLA database with V2 mappings
 
 ```shell
 $ pyard-import --v2-to-v3-mapping map2to3.csv
@@ -298,7 +298,7 @@ $ pyard-import --v2-to-v3-mapping map2to3.csv
 #### Refresh the MAC for the specified version
 
 ```shell
-$ pyard-import --imgt-version 3450 --refresh-mac
+$ pyard-import --ipd-version 3450 --refresh-mac
 ```
 
 #### Skip MAC loading
@@ -306,7 +306,7 @@ $ pyard-import --imgt-version 3450 --refresh-mac
 You can skip loading MAC if you don't need by using `--skip-mac`
 
 ```shell
-$ pyard-import --imgt-version 3150 --skip-mac
+$ pyard-import --ipd-version 3150 --skip-mac
 ```
 
 ### `pyard-status` Show database status
@@ -322,8 +322,8 @@ $ pyard-status
 Use ` --data-dir` to specify an alternate directory for cached database files.
 ```shell
 $ pyard-status  --data-dir ~/.pyard/
-IMGT DB Version: Latest (3440)
-There is a newer IMGT release than version 3440
+IPD-IMGT/HLA DB Version: Latest (3440)
+There is a newer IPD-IMGT/HLA release than version 3440
 Upgrade to latest version '3510' with 'pyard-import --re-install'
 File: /Users/pbashyal/.pyard/pyard-Latest.sqlite3
 Size: 533.37MB
@@ -361,7 +361,7 @@ options:
   -v, --version         IPD-IMGT/HLA DB Version number
   -d DATA_DIR, --data-dir DATA_DIR
                         Data directory to store imported data
-  -i IMGT_VERSION, --imgt-version IMGT_VERSION
+  -i IPD_VERSION, --ipd-version IPD_VERSION
                         IPD-IMGT/HLA db to use for redux
   -g GL_STRING, --gl GL_STRING
                         GL String to reduce

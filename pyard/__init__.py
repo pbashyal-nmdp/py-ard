@@ -31,7 +31,7 @@ __version__ = "1.0.7"
 
 
 def init(
-    imgt_version: str = "Latest",
+    ipd_version: str = "Latest",
     data_dir: str = None,
     load_mac: bool = True,
     cache_size: int = DEFAULT_CACHE_SIZE,
@@ -40,7 +40,7 @@ def init(
     from .ard import ARD
 
     ard = ARD(
-        imgt_version=imgt_version,
+        ipd_version=ipd_version,
         data_dir=data_dir,
         load_mac=load_mac,
         max_cache_size=cache_size,

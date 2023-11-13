@@ -30,7 +30,7 @@ from pyard.constants import VALID_REDUCTION_TYPES
 import pyard.misc
 from pyard.db import similar_alleles, similar_mac
 from pyard.exceptions import InvalidAlleleError, InvalidTypingError, InvalidMACError
-from pyard.misc import get_data_dir, get_imgt_version
+from pyard.misc import get_data_dir, get_ipd_version
 
 
 def find_similar_alleles(ard, prefix):
@@ -129,8 +129,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-i",
-        "--imgt-version",
-        dest="imgt_version",
+        "--ipd-version",
+        dest="ipd_version",
         help="IPD-IMGT/HLA db to use for redux",
     )
     parser.add_argument("-g", "--gl", dest="gl_string", help="GL String to reduce")
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    imgt_version = get_imgt_version(args.imgt_version)
+    ipd_version = get_ipd_version(args.imgt_version)
     data_dir = get_data_dir(args.data_dir)
 
     new_config = {}
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     if args.verbose:
         new_config["verbose_log"] = True
 
-    ard = pyard.init(imgt_version=imgt_version, data_dir=data_dir, config=new_config)
+    ard = pyard.init(ipd_version=ipd_version, data_dir=data_dir, config=new_config)
 
     # Handle --version option
     if args.version:

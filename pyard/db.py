@@ -30,13 +30,13 @@ from .mappings import ARSMapping, CodeMappings, AlleleGroups
 from .misc import get_imgt_db_versions, get_default_db_directory
 
 
-def create_db_connection(data_dir, imgt_version, ro=False):
+def create_db_connection(data_dir, ipd_version, ro=False):
     """
     Create a  connection to a sqlite database in read-only mode
     or read-write mode (default)
 
     :param data_dir: The directory where the db is/will be created
-    :param imgt_version: IMGT db version
+    :param ipd_version: IPD-IMGT/HLA db version
     :param ro: Read-only mode ?
     :return: db connection of type sqlite.Connection
     """
@@ -44,7 +44,7 @@ def create_db_connection(data_dir, imgt_version, ro=False):
     if data_dir is None:
         data_dir = get_default_db_directory()
 
-    db_filename = f"{data_dir}/pyard-{imgt_version}.sqlite3"
+    db_filename = f"{data_dir}/pyard-{ipd_version}.sqlite3"
 
     if ro:
         # If in read-only mode, make sure the db file exists
@@ -55,14 +55,14 @@ def create_db_connection(data_dir, imgt_version, ro=False):
         # Multiple threads can access the same connection since it's only ro
         return sqlite3.connect(file_uri, check_same_thread=False, uri=True), db_filename
 
-    # Check the imgt_version is a valid IMGT DB Version
-    # by querying the IMGT site
-    if imgt_version != "Latest":
+    # Check the ipd_version is a valid IPD-IMGT/HLA DB Version
+    # by querying the IPD-IMGT/HLA site
+    if ipd_version != "Latest":
         if not pathlib.Path(db_filename).exists():
             all_imgt_versions = get_imgt_db_versions()
-            if str(imgt_version) not in all_imgt_versions:
+            if str(ipd_version) not in all_imgt_versions:
                 raise ValueError(
-                    f"{imgt_version} is not a valid IMGT database version."
+                    f"{ipd_version} is not a valid IPD-IMGT/HLA database version."
                 )
 
     # Create the data directory if it doesn't exist

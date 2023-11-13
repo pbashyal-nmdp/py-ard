@@ -70,14 +70,14 @@ def expression_reduce(df):
     return None
 
 
-def generate_ard_mapping(db_connection: sqlite3.Connection, imgt_version) -> ARSMapping:
+def generate_ard_mapping(db_connection: sqlite3.Connection, ipd_version) -> ARSMapping:
     if db.tables_exist(db_connection, ars_mapping_tables):
         return db.load_ars_mappings(db_connection)
 
     import pandas as pd
 
-    df_g_group = load_g_group(imgt_version)
-    df_p_group = load_p_group(imgt_version)
+    df_g_group = load_g_group(ipd_version)
+    df_p_group = load_p_group(ipd_version)
 
     # compare df_p_group["2d"] with df_g_group["2d"] to find 2-field alleles in the
     # P-group that aren't in the G-group
@@ -176,14 +176,14 @@ def generate_ard_mapping(db_connection: sqlite3.Connection, imgt_version) -> ARS
 
 
 def generate_alleles_and_xx_codes_and_who(
-    db_connection: sqlite3.Connection, imgt_version, ars_mappings
+    db_connection: sqlite3.Connection, ipd_version, ars_mappings
 ):
     if db.tables_exist(db_connection, code_mapping_tables + allele_tables):
         return db.load_code_mappings(db_connection)
 
     import pandas as pd
 
-    allele_df = load_allele_list(imgt_version)
+    allele_df = load_allele_list(ipd_version)
 
     # Create a set of valid alleles
     # All 2-field, 3-field and the original Alleles are considered valid alleles
@@ -354,9 +354,9 @@ def to_serological_name(locus_name: str):
     return sero_name
 
 
-def generate_serology_mapping(db_connection: sqlite3.Connection, imgt_version):
+def generate_serology_mapping(db_connection: sqlite3.Connection, ipd_version):
     if not db.table_exists(db_connection, "serology_mapping"):
-        df_sero = load_serology_mappings(imgt_version)
+        df_sero = load_serology_mappings(ipd_version)
 
         import pandas as pd
 
@@ -418,28 +418,28 @@ def generate_serology_mapping(db_connection: sqlite3.Connection, imgt_version):
         db.save_serology_mappings(db_connection, sero_mapping)
 
 
-def generate_v2_to_v3_mapping(db_connection: sqlite3.Connection, imgt_version):
+def generate_v2_to_v3_mapping(db_connection: sqlite3.Connection, ipd_version):
     if not db.table_exists(db_connection, "v2_mapping"):
         db.load_v2_v3_mappings(db_connection)
 
 
-def set_db_version(db_connection: sqlite3.Connection, imgt_version):
+def set_db_version(db_connection: sqlite3.Connection, ipd_version):
     """
-    Set the IMGT database version number as a user_version string in
+    Set the IPD-IMGT/HLA database version number as a user_version string in
     the database itself.
 
     :param db_connection: Active SQLite Connection
-    :param imgt_version: current imgt_version
+    :param ipd_version: current IPD-IMGT/HLA db version
     """
     # If version already exists, don't reset
     version = db.get_user_version(db_connection)
     if version:
         return version
 
-    if imgt_version == "Latest":
+    if ipd_version == "Latest":
         version = load_latest_version()
     else:
-        version = imgt_version
+        version = ipd_version
 
     db.set_user_version(db_connection, int(version))
     print("Version:", version)
@@ -451,10 +451,10 @@ def get_db_version(db_connection: sqlite3.Connection):
 
 
 def generate_serology_broad_split_mapping(
-    db_connection: sqlite3.Connection, imgt_version
+    db_connection: sqlite3.Connection, ipd_version
 ):
     if not db.table_exists(db_connection, "serology_broad_split_mapping"):
-        sero_mapping = pyard.load.load_serology_broad_split_mapping(imgt_version)
+        sero_mapping = pyard.load.load_serology_broad_split_mapping(ipd_version)
         db.save_serology_broad_split_mappings(db_connection, sero_mapping)
         return sero_mapping
 
