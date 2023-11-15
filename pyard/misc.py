@@ -93,7 +93,7 @@ def get_P_name(a: str) -> str:
     return ":".join(a.split(":")[0:2]) + "P"
 
 
-def get_imgt_db_versions() -> List[str]:
+def get_ipd_db_versions() -> List[str]:
     import urllib.request
     import json
 

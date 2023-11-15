@@ -27,7 +27,7 @@ import sys
 from typing import Tuple, Dict, Set, List
 
 from .mappings import ARSMapping, CodeMappings, AlleleGroups
-from .misc import get_imgt_db_versions, get_default_db_directory
+from .misc import get_ipd_db_versions, get_default_db_directory
 
 
 def create_db_connection(data_dir, ipd_version, ro=False):
@@ -59,8 +59,8 @@ def create_db_connection(data_dir, ipd_version, ro=False):
     # by querying the IPD-IMGT/HLA site
     if ipd_version != "Latest":
         if not pathlib.Path(db_filename).exists():
-            all_imgt_versions = get_imgt_db_versions()
-            if str(ipd_version) not in all_imgt_versions:
+            all_ipd_versions = get_ipd_db_versions()
+            if str(ipd_version) not in all_ipd_versions:
                 raise ValueError(
                     f"{ipd_version} is not a valid IPD-IMGT/HLA database version."
                 )

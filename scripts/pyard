@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    ipd_version = get_ipd_version(args.imgt_version)
+    ipd_version = get_ipd_version(args.ipd_version)
     data_dir = get_data_dir(args.data_dir)
 
     new_config = {}
