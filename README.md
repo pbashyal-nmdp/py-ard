@@ -6,6 +6,18 @@ Swiss army knife of **HLA** Nomenclature
 
 ![py-ard-logo.png](images/py-ard-logo.png)
 
+**Note:**
+
+Release `1.1.1` has extensive Serolgy related updates and affects Serology related data. Please rebuild the cache database if there's a missing Serology error.
+```
+pyard-import --re-install
+```
+
+Or set `py-ard` requirements to be `py-ard<=1.1.1` for your dependency.
+
+
+---
+
 ### `py-ard` is ARD reduction for HLA in Python
 
 Human leukocyte antigen (HLA) genes encode cell surface proteins that are important for immune regulation. Exons encoding the Antigen Recognition Domain (ARD) are the most polymorphic region of HLA genes and are important for donor/recipient [HLA matching](https://bethematch.org/patients-and-families/before-transplant/find-a-donor/hla-matching/). The history of allele typing methods has played a major role in determining resolution and ambiguity of reported HLA values. Although HLA [nomenclature](https://www.theatlantic.com/magazine/archive/2023/04/clint-smith-nomenclature-poem/673097/) has not always conformed to the same standard, it is now defined by [The WHO Nomenclature Committee for Factors of the HLA System](https://hla.alleles.org/nomenclature/committee.html). `py-ard` is aware of the variation in historical resolutions and grouping and is able to translate from one representation to another based on alleles published quarterly by [IPD/IMGT-HLA](https://github.com/ANHIG/IMGTHLA/).
