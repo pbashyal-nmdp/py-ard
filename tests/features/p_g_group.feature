@@ -23,6 +23,7 @@ Feature: P and G Groups
 
     Examples:
       | Allele  | Level | Redux Allele |
+      | DQA1*03:03:09 | lg    | DQA1*03:03g  |
       | C*06:17 | lgx   | C*06:02      |
 
     Examples: DRB4*01s

@@ -88,3 +88,17 @@ Feature: Alleles
       | MICA*040 | lgx   | MICA*040     |
       | MICB*006 | lgx   | MICB*006     |
       | MICB*029 | lgx   | MICB*029     |
+
+
+  Scenario Outline: Alleles with little 'g'
+
+   Alleles that are little 'g' are valid alleles.
+
+    Given the allele as <Allele>
+    When reducing on the <Level> level
+    Then the reduced allele is found to be <Redux Allele>
+
+    Examples:
+      | Allele       | Level | Redux Allele    |
+      | A*30:02g     | lgx   | A*30:02         |
+      | HLA-A*01:01g | G     | HLA-A*01:01:01G |

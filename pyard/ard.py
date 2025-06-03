@@ -204,9 +204,14 @@ class ARD(object):
         # C*12:02:02    => C*12:02:01G
         # C*12:02       => C*12:02:01G
 
+        # Remove little 'g' before processing
+        # if allele.endswith('g'):
+        #     allele = allele[:-1]
+
         if allele.endswith(("P", "G")):
             if redux_type in ["lg", "lgx", "G"]:
                 allele = allele[:-1]
+
         if self._config["ping"] and re_ping:
             # ping: alleles that are in P group but not in G groups are defined
             # for 2-field alleles. If not already in 2-field form, reduce it to
@@ -810,6 +815,10 @@ class ARD(object):
         @param allele:
         @return:
         """
+        # Alleles ending with little 'g' are valid_alleles
+        if allele.endswith("g"):
+            # remove the 'g' character
+            allele = allele[:-1]
         # Alleles ending with P or G are valid_alleles
         if allele.endswith(("P", "G")):
             # remove the last character
