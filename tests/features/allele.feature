@@ -94,11 +94,15 @@ Feature: Alleles
     When reducing on the <Level> level in ignore_suffix mode
     Then the reduced allele is found to be <Redux Allele>
 
-    Examples:
+    Examples: Ignored alleles
       | Allele    | Level | Redux Allele |
       | DRBX*NNNN | lgx   | DRBX*NNNN    |
       | DRBX*NNNN | G     | DRBX*NNNN    |
       | DRB1*UUUU | lg    | DRB1*UUUU    |
+
+    Examples: Serology works
+      | Allele | Level | Redux Allele                                           |
+      | DR17   | lgx   | DRB1*03:01/DRB1*03:04/DRB1*03:10/DRB1*03:11/DRB1*03:43 |
 
   Scenario Outline: Allele validation in ignore_suffix mode
 
@@ -111,3 +115,4 @@ Feature: Alleles
     Examples:
       | Allele    | Validity |
       | DRBX*NNNN | Valid    |
+      | DR17      | Valid    |

@@ -457,11 +457,6 @@ class ARD(object):
                 [self.redux(a, redux_type) for a in glstring.split("/")], "/"
             )
 
-        if self._config["ignore_allele_with_suffixes"]:
-            _, fields = glstring.split("*")
-            if fields in self._config["ignore_allele_with_suffixes"]:
-                return glstring
-
         # Handle V2 to V3 mapping
         if self.is_v2(glstring):
             glstring = self._map_v2_to_v3(glstring)
@@ -481,7 +476,11 @@ class ARD(object):
             loc_antigen, code = loc_allele[0], loc_allele[1]
         else:
             if "*" in glstring:
-                locus, _ = glstring.split("*")
+                locus, fields = glstring.split("*")
+                if self._config["ignore_allele_with_suffixes"]:
+                    if fields in self._config["ignore_allele_with_suffixes"]:
+                        return glstring
+
                 if locus not in G_GROUP_LOCI:
                     return glstring
             raise InvalidTypingError(
