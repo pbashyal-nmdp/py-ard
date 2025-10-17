@@ -30,6 +30,19 @@ from .mappings import ARSMapping, CodeMappings, AlleleGroups
 from .misc import get_imgt_db_versions, get_default_db_directory
 
 
+def get_db_path(data_dir, imgt_version):
+    """
+    Get the database file path
+
+    :param data_dir: The directory where the db is/will be created
+    :param imgt_version: IMGT db version
+    :return: database file path
+    """
+    if data_dir is None:
+        data_dir = get_default_db_directory()
+    return f"{data_dir}/pyard-{imgt_version}.sqlite3"
+
+
 def create_db_connection(data_dir, imgt_version, ro=False):
     """
     Create a  connection to a sqlite database in read-only mode
@@ -53,7 +66,12 @@ def create_db_connection(data_dir, imgt_version, ro=False):
         # Open the database in read-only mode
         file_uri = f"file:{db_filename}?mode=ro"
         # Multiple threads can access the same connection since it's only ro
-        return sqlite3.connect(file_uri, check_same_thread=False, uri=True), db_filename
+        connection = sqlite3.connect(file_uri, check_same_thread=False, uri=True)
+        # Configure connection for better performance
+        connection.execute("PRAGMA synchronous=NORMAL")
+        connection.execute("PRAGMA cache_size=10000")
+        connection.execute("PRAGMA temp_store=MEMORY")
+        return connection, db_filename
 
     # Check the imgt_version is a valid IMGT DB Version
     # by querying the IMGT site
@@ -91,7 +109,13 @@ def create_db_connection(data_dir, imgt_version, ro=False):
 
     # Open the database for read/write
     file_uri = f"file:{db_filename}"
-    return sqlite3.connect(file_uri, uri=True), db_filename
+    connection = sqlite3.connect(file_uri, uri=True)
+    # Configure connection for better performance
+    connection.execute("PRAGMA journal_mode=WAL")
+    connection.execute("PRAGMA synchronous=NORMAL")
+    connection.execute("PRAGMA cache_size=10000")
+    connection.execute("PRAGMA temp_store=MEMORY")
+    return connection, db_filename
 
 
 def table_exists(connection: sqlite3.Connection, table_name: str) -> bool:

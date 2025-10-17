@@ -21,7 +21,11 @@ class SerologyHandler:
 
     def get_alleles_from_serology(self, serology: str) -> Iterable[str]:
         """Get alleles corresponding to serology"""
-        alleles = db.serology_to_alleles(self.ard.db_connection, serology)
+        # Use data repository if available
+        if hasattr(self.ard, "data_repository"):
+            alleles = self.ard.data_repository.get_serology_alleles(serology)
+        else:
+            alleles = db.serology_to_alleles(self.ard.db_connection, serology)
         return set(filter(self.ard._is_allele_in_db, alleles))
 
     def find_broad_splits(self, allele: str) -> tuple:
@@ -35,7 +39,11 @@ class SerologyHandler:
     def find_xx_from_serology(self, serology: str) -> str:
         """Find XX code from serology"""
         if self.is_serology(serology):
-            return db.find_xx_for_serology(self.ard.db_connection, serology)
+            # Use data repository if available
+            if hasattr(self.ard, "data_repository"):
+                return self.ard.data_repository.find_xx_for_serology(serology)
+            else:
+                return db.find_xx_for_serology(self.ard.db_connection, serology)
         from ..exceptions import InvalidAlleleError
 
         raise InvalidAlleleError(f"{serology} is not a valid serology")

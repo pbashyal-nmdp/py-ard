@@ -28,7 +28,13 @@ class MACHandler:
                 locus_antigen, code = allele_split
                 if code.isalpha():
                     try:
-                        alleles = db.mac_code_to_alleles(self.ard.db_connection, code)
+                        # Use data repository if available
+                        if hasattr(self.ard, "data_repository"):
+                            alleles = self.ard.data_repository.get_mac_alleles(code)
+                        else:
+                            alleles = db.mac_code_to_alleles(
+                                self.ard.db_connection, code
+                            )
                         if alleles:
                             if any(map(lambda a: ":" in a, alleles)):
                                 antigen_groups = map(lambda a: a.split(":")[0], alleles)
@@ -64,14 +70,21 @@ class MACHandler:
             mac_expansion = "/".join(
                 sorted({allele.split(":")[1] for allele in allele_fields})
             )
-            mac_code = db.alleles_to_mac_code(self.ard.db_connection, mac_expansion)
+            # Use data repository if available
+            if hasattr(self.ard, "data_repository"):
+                mac_code = self.ard.data_repository.alleles_to_mac_code(mac_expansion)
+            else:
+                mac_code = db.alleles_to_mac_code(self.ard.db_connection, mac_expansion)
             if mac_code:
                 locus = allelelist_gl.split("*")[0]
                 return f"{locus}*{antigen_groups[0]}:{mac_code}"
 
         # Try given list order
         mac_expansion = "/".join(allele_fields)
-        mac_code = db.alleles_to_mac_code(self.ard.db_connection, mac_expansion)
+        if hasattr(self.ard, "data_repository"):
+            mac_code = self.ard.data_repository.alleles_to_mac_code(mac_expansion)
+        else:
+            mac_code = db.alleles_to_mac_code(self.ard.db_connection, mac_expansion)
         if mac_code:
             locus = allelelist_gl.split("*")[0]
             return f"{locus}*{antigen_groups[0]}:{mac_code}"
@@ -82,7 +95,10 @@ class MACHandler:
                 allele_fields, key=functools.cmp_to_key(self.ard.smart_sort_comparator)
             )
         )
-        mac_code = db.alleles_to_mac_code(self.ard.db_connection, mac_expansion)
+        if hasattr(self.ard, "data_repository"):
+            mac_code = self.ard.data_repository.alleles_to_mac_code(mac_expansion)
+        else:
+            mac_code = db.alleles_to_mac_code(self.ard.db_connection, mac_expansion)
         if mac_code:
             locus = allelelist_gl.split("*")[0]
             return f"{locus}*{antigen_groups[0]}:{mac_code}"
@@ -91,7 +107,11 @@ class MACHandler:
 
     def _get_alleles(self, code, locus_antigen) -> Iterable[str]:
         """Get alleles for MAC code"""
-        alleles = db.mac_code_to_alleles(self.ard.db_connection, code)
+        # Use data repository if available
+        if hasattr(self.ard, "data_repository"):
+            alleles = self.ard.data_repository.get_mac_alleles(code)
+        else:
+            alleles = db.mac_code_to_alleles(self.ard.db_connection, code)
 
         is_allelic_expansion = any([":" in allele for allele in alleles])
         if is_allelic_expansion:

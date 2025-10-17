@@ -34,7 +34,11 @@ class V2Handler:
 
     def map_v2_to_v3(self, v2_allele: str) -> str:
         """Convert V2 allele to V3 format"""
-        v3_allele = db.v2_to_v3_allele(self.ard.db_connection, v2_allele)
+        # Use data repository if available
+        if hasattr(self.ard, "data_repository"):
+            v3_allele = self.ard.data_repository.v2_to_v3_allele(v2_allele)
+        else:
+            v3_allele = db.v2_to_v3_allele(self.ard.db_connection, v2_allele)
         if not v3_allele:
             v3_allele = self._predict_v3(v2_allele)
         return v3_allele
