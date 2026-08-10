@@ -1,0 +1,19 @@
+[pyard]
+imgt_version = 3640
+data_dir = "~/.py-ard/"
+load_mac = true
+cache_size = 1000
+
+[pyard.config]
+reduce_serology = true
+reduce_v2 = true
+reduce_3field = true
+reduce_P = true
+reduce_XX = true
+reduce_MAC = true
+reduce_shortnull = true
+ping = true
+verbose_log = false
+ARS_as_lg = false
+strict = true
+ignore_allele_with_suffixes = []
