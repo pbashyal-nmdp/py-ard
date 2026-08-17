@@ -34,6 +34,7 @@ another based on alleles published quarterly by [IPD/IMGT-HLA](https://github.co
 2. [Using `py-ard`](#using-py-ard)
     * [Using `py-ard` from Python](#using-py-ard-from-python-code)
     * [Using `py-ard` from R](#using-py-ard-from-r-code)
+    * [`.pyardrc` Configuration File](#pyardrc-configuration-file)
     * [Perform Reduction](#reduce-typings)
     * [DRBX blending](#perform-drb1-blending-with-drb3-drb4-and-drb5)
     * [Expand/Lookup MAC](#mac-codes)
@@ -189,6 +190,56 @@ config = {
 }
 
 ard = pyard.init('3510', config=config)
+```
+
+### `.pyardrc` Configuration File
+
+`py-ard` looks for a `.pyardrc` file in the current directory first, then in the home directory (`~/`).
+When found, it is used as the default configuration for `pyard.init()`,
+so you can call `pyard.init()` with no arguments and have your preferred settings applied automatically.
+
+The file uses [TOML](https://toml.io) format.
+Copy [`extras/sample.pyardrc`](extras/sample.pyardrc) as a starting template:
+
+```shell
+cp extras/sample.pyardrc ~/.pyardrc
+```
+
+The `[pyard]` table maps to the `pyard.init()` parameters:
+
+```toml
+[pyard]
+imgt_version = "3640"
+data_dir = "~/.py-ard/"
+load_mac = true
+cache_size = 1000
+```
+
+The `[pyard.config]` table maps to the `ARDConfig` reduction settings:
+
+```toml
+[pyard.config]
+reduce_serology = true
+reduce_v2 = true
+reduce_3field = true
+reduce_P = true
+reduce_XX = true
+reduce_MAC = true
+reduce_shortnull = true
+ping = true
+verbose_log = false
+ARS_as_lg = false
+strict = true
+ignore_allele_with_suffixes = []
+```
+
+Any argument passed explicitly to `pyard.init()` takes precedence over the `.pyardrc` values:
+
+You can set the environment variable `PYARD_RC` to `no` to skip reading the `.pyardrc` config.
+
+```shell
+export PYARD_RC=no
+pyard -g "A*02:01" -r hats
 ```
 
 ### Reduce Typings
