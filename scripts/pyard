@@ -90,6 +90,11 @@ def find_broad_splits(ard):
 
 
 def show_version():
+    print(f"py-ard version:", pyard.__version__)
+    sys.exit(0)
+
+
+def show_db_version():
     version = ard.get_db_version()
     print(f"IPD-IMGT/HLA version:", version)
     print(f"py-ard version:", pyard.__version__)
@@ -114,6 +119,13 @@ if __name__ == "__main__":
         "-v",
         "--version",
         dest="version",
+        action="store_true",
+        help="py-ard version",
+    )
+    parser.add_argument(
+        "-V",
+        "--db-version",
+        dest="db_version",
         action="store_true",
         help="IPD-IMGT/HLA DB Version number",
     )
@@ -194,6 +206,10 @@ if __name__ == "__main__":
     # Handle --version option
     if args.version:
         show_version()
+
+    # Handle --db-version option
+    if args.db_version:
+        show_db_version()
 
     # Handle --splits option
     if args.splits:
